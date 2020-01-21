@@ -7,56 +7,31 @@ const fetch = require('node-fetch');
 const process = require('process');
 const isDocker = require('is-docker');
 const fs = require('fs');
+const path = require('path')
 
 const DEBUG = 0;  // 1 for database debugging
 
-var configFile;
-var config = {};
 const tautulli = require('./src/tautulli.js');
 const sonarr = require('./src/sonarr.js');
 const sql = new SQLite('./config/database.sqlite');
 
-var configFilePath = './config/config.json';
-
-fs.access(configFilePath, fs.F_OK, (err) => {
-  if (err) {
-    // File does not exist, should be using docker environmental variables if thats the case.
-  } else {
-		configFile = require("./config/config.json");
-	}
-});
+let config = {}
+let configFile = null
+try {
+	configFile = require('./config/config.json')
+} catch(e) {
+	// File does not exist, should be using docker environmental variables if thats the case.
+	// assigning sample config file to check process.env for present values
+	configFile = require('./config/config.sample.json')
+}
 
 
 if (isDocker()) {
-	if (process.env.botToken !== undefined) config.botToken = process.env.botToken;
-	else config.botToken = configFile.botToken;
-
-	if (process.env.defaultPrefix !== undefined) config.defaultPrefix = process.env.defaultPrefix;
-	else config.defaultPrefix = configFile.defaultPrefix;
-
-	if (process.env.tautulli_ip !== undefined) config.tautulli_ip = process.env.tautulli_ip;
-	else config.tautulli_ip = configFile.tautulli_ip;
-
-	if (process.env.tautulli_port !== undefined) config.tautulli_port = process.env.tautulli_port;
-	else config.tautulli_port = configFile.tautulli_port;
-
-	if (process.env.tautulli_api_key !== undefined) config.tautulli_api_key = process.env.tautulli_api_key;
-	else config.tautulli_api_key = configFile.tautulli_api_key;
-
-	if (process.env.sonarr_ip !== undefined) config.sonarr_ip = process.env.sonarr_ip;
-	else config.sonarr_ip = configFile.sonarr_ip;
-
-	if (process.env.sonarr_port !== undefined) config.sonarr_port = process.env.sonarr_port;
-	else config.sonarr_port = configFile.sonarr_port;
-
-	if (process.env.sonarr_api_key !== undefined) config.sonarr_api_key = process.env.sonarr_api_key;
-	else config.sonarr_api_key = configFile.sonarr_api_key;
-
-	if (process.env.node_hook_ip !== undefined) config.node_hook_ip = process.env.node_hook_ip;
-	else config.node_hook_ip = configFile.node_hook_ip;
-
-	if (process.env.node_hook_port !== undefined) config.node_hook_port = process.env.node_hook_port;
-	else config.node_hook_port = configFile.node_hook_port;
+	for (let [key, value] of Object.entries(configFile)) {
+		// checking keys from provided config file to available env keys
+		if (process.env[key] !== undefined) config[key] = process.env[key]
+		else config[key] = configFile[key]
+	}
 }
 else {
 	config = require("./config/config.json");

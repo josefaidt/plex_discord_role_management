@@ -4,6 +4,8 @@
   "description": "A discord bot that synchronizes with Tautulli and Sonarr to deliver tailored notifications.",
   "main": "index.js",
   "scripts": {
+    "start": "npm run develop",
+    "develop": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -30,6 +32,16 @@
     "node-schedule": "^1.3.2",
     "opusscript": "^0.0.7",
     "process": "^0.11.10"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2",
+    "prettier": "^1.19.1"
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": true,
+    "singleQuote": true
   },
   "bugs": {
     "url": "https://github.com/CyaOnDaNet/plex_discord_role_management/issues"
